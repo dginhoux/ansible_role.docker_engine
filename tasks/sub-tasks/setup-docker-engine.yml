@@ -1,0 +1,67 @@
+---
+- block:
+    - name: prefix the docker package version with the correct separator on redhat
+      set_fact:
+        _docker_package_version: "-{{ docker_package_version }}"
+      when: ansible_os_family == 'RedHat'
+
+    - name: prefix the docker package version with the correct separator on debian
+      set_fact:
+        _docker_package_version: "={{ docker_package_version }}"
+      when: ansible_os_family == 'Debian'
+  when: docker_package_version | length > 0
+
+
+- name: install docker
+  package:
+    name: "{{ docker_package_name }}{{ _docker_package_version | default('') }}"
+    state: "{{ docker_package_state }}"
+
+
+- block:
+    - name: create the systemd overrides directory for docker
+      file:
+        name: "/etc/systemd/system/docker.service.d"
+        state: directory
+
+    - name: override the systemd unit for docker
+      template:
+        src: docker-override.conf.j2
+        dest: "/etc/systemd/system/docker.service.d/override.conf"
+      register: _docker_systemd_override
+
+    - name: reload systemd and restart docker
+      service:
+        name: docker
+        state: "{% if docker_service_state != 'stopped' %}restarted{% else %}stopped{% endif %}"
+        daemon_reload: yes
+      when: _docker_systemd_override.changed
+  when: docker_service_override | length > 0
+        and
+        ansible_service_mgr == 'systemd'
+
+
+- name: make sure the docker daemon configuration directory exists
+  file:
+    path: /etc/docker
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+
+- name: configure the docker deamon
+  template:
+    src: docker-daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart docker
+
+
+- name: enable the docker daemon service and start it
+  service:
+    name: docker
+    state: "{{ docker_service_state }}"
+    enabled: "{{ docker_service_enabled }}"

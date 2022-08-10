@@ -1,0 +1,22 @@
+---
+
+- name: install yum-utils if necessary
+  yum:
+    name: yum-utils
+    state: present
+
+
+- name: add the yum docker repository
+  yum_repository:
+    name: "{{ docker_repo['name'] }}"
+    file: "{{ docker_repo['name'] }}"
+    description: "{{ docker_repo['name'] }}"
+    baseurl: "{{ docker_repo['yum_repo'] }}"
+    gpgkey: "{{ docker_repo['yum_gpg_key'] | default(omit) }}"
+    gpgcheck: "{{ docker_repo['yum_gpg_check'] | default(False) }}"
+    state: present
+
+
+# - name: clean yum cache
+#   command: /usr/bin/yum clean all
+#   ignore_errors: true

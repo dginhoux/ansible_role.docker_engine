@@ -1,0 +1,6 @@
+---
+- name: install docker-py
+  pip:
+    name: "{{ docker_py_package_name }}"
+    version: "{{ docker_py_package_version }}"
+    state: "{{ docker_py_package_state }}"
