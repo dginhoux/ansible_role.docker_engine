@@ -1,7 +1,7 @@
 ---
 
 galaxy_info:
-  role_name: ginhouxnet.docker_engine
+  role_name: docker_engine
   description: install and configure docker engine
   author: dginhoux
   company: ginhouxnet
