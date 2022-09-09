@@ -1,7 +1,7 @@
 ginhouxnet.docker_engine
 =========
 
-This ansible role install (and uninstall) docker engine and configure it
+This ansible role install, configure and uninstall docker engine
 
 
 Requirements
@@ -20,6 +20,7 @@ Dependencies
 ------------
 
 none
+
 
 Example Playbook
 ----------------
