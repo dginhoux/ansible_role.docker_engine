@@ -1,4 +1,4 @@
-ginhouxnet.docker_engine
+Ansible Role : dginhoux.docker_engine
 =========
 
 This ansible role install, configure and uninstall docker engine
