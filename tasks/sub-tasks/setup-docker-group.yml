@@ -8,7 +8,6 @@
   become: true
   with_items: "{{ docker_group_users }}"
 
-
 # - block:
 #     # See http://stackoverflow.com/a/37337848/1370301
 #     - name: reset ansible connection after group changes (ansible < 2.3.0)
@@ -31,10 +30,9 @@
 #     and ansible_user in docker_group_users
 #     and ansible_user in (addtogroup.results | selectattr('changed') | map(attribute='item') | list)
 
-
 - name: reset ansible connection after group changes
   meta: reset_connection
   when: ansible_connection in ['ssh', 'smart']
-        and ansible_user is defined
-        and ansible_user in docker_group_users
-        and ansible_user in (addtogroup.results | selectattr('changed') | map(attribute='item') | list)
+    and ansible_user is defined
+    and ansible_user in docker_group_users
+    and ansible_user in (addtogroup.results | selectattr('changed') | map(attribute='item') | list)

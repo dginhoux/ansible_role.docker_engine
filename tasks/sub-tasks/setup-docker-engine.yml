@@ -11,12 +11,10 @@
       when: ansible_os_family == 'Debian'
   when: docker_package_version | length > 0
 
-
 - name: install docker
   package:
     name: "{{ docker_package_name }}{{ _docker_package_version | default('') }}"
     state: "{{ docker_package_state }}"
-
 
 - block:
     - name: create the systemd overrides directory for docker
@@ -34,12 +32,11 @@
       service:
         name: docker
         state: "{% if docker_service_state != 'stopped' %}restarted{% else %}stopped{% endif %}"
-        daemon_reload: yes
+        daemon_reload: true
       when: _docker_systemd_override.changed
   when: docker_service_override | length > 0
-        and
-        ansible_service_mgr == 'systemd'
-
+    and
+    ansible_service_mgr == 'systemd'
 
 - name: make sure the docker daemon configuration directory exists
   file:
@@ -49,7 +46,6 @@
     mode: 0755
     state: directory
 
-
 - name: configure the docker deamon
   template:
     src: docker-daemon.json.j2
@@ -58,7 +54,6 @@
     group: root
     mode: 0640
   notify: restart docker
-
 
 - name: enable the docker daemon service and start it
   service:

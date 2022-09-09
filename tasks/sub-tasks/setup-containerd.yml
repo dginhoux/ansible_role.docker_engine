@@ -11,7 +11,6 @@
       when: ansible_os_family == 'Debian'
   when: containerd_package_version | length > 0
 
-
 - name: install containerd
   package:
     name: "{{ containerd_package_name }}{{ _containerd_package_version | default('') }}"
@@ -20,13 +19,11 @@
 #         or
 #         (ansible_os_family == 'RedHat' and ansible_distribution_major_version != '8')
 
-
 # - name: install containerd on redhat 8
 #   package:
 #     name: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm"
 #     state: "{{ containerd_package_state }}"
 #   when: ansible_os_family == 'RedHat' and ansible_distribution_major_version == '8'
-
 
 - block:
     - name: create the systemd overrides directory for containerd
@@ -44,12 +41,11 @@
       service:
         name: containerd
         state: "{% if containerd_service_state != 'stopped' %}restarted{% else %}stopped{% endif %}"
-        daemon_reload: yes
+        daemon_reload: true
       when: _containerd_systemd_override.changed
   when: containerd_service_override | length > 0
-        and
-        ansible_service_mgr == 'systemd'
-
+    and
+    ansible_service_mgr == 'systemd'
 
 - name: enable the containerd daemon service and start it
   service:

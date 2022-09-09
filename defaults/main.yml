@@ -1,20 +1,23 @@
 ---
-
 docker_deploy_action: install
 # docker_deploy_action: uninstall
-
 
 ##
 # Role Switches
 ##
 # Switches disabling the docker-engine, docker group and swarm-mode setup.
-docker_engine_skip_repo: false            # if true, skips the setup of the docker repository
-docker_engine_skip_containerd: false      # if true, skips the setup of containerd
-docker_engine_skip_engine: false          # if true, skips the docker engine installation
-docker_engine_skip_cli: false             # if true, skips the docker cli installation
-docker_engine_skip_group: false           # if true, do not add the docker_admin_users to the docker_group_name
-docker_engine_skip_docker_py: false       # if true, skips the installation of docker-py
-
+# if true, skips the setup of the docker repository
+docker_engine_skip_repo: false
+# if true, skips the setup of containerd
+docker_engine_skip_containerd: false
+# if true, skips the docker engine installation
+docker_engine_skip_engine: false
+# if true, skips the docker cli installation
+docker_engine_skip_cli: false
+# if true, do not add the docker_admin_users to the docker_group_name
+docker_engine_skip_group: false
+# if true, skips the installation of docker-py
+docker_engine_skip_docker_py: false
 
 ##
 # Docker
@@ -84,7 +87,6 @@ docker_service_override: |
   [Install]
   WantedBy=multi-user.target
 
-
 # State of the Docker deamon service
 docker_service_state: "started"
 
@@ -115,7 +117,6 @@ docker_daemon_config:
   tls: false
   shutdown-timeout: 90
 
-
 ##
 # Docker CLI
 ##
@@ -128,7 +129,6 @@ docker_cli_package_version: ""
 # Installation state of the Docker CLI package.
 # Set it to 'latest' to upgrade the Docker CLI to the latest version.
 docker_cli_package_state: present
-
 
 ##
 # Containerd
@@ -156,7 +156,6 @@ containerd_service_state: "started"
 # Whether the containerd service should start on boot
 containerd_service_enabled: "yes"
 
-
 ##
 # Docker-py
 ##
@@ -170,7 +169,6 @@ docker_py_package_version: ""
 # Set it to 'latest' to upgrade the Docker CLI to the latest version.
 docker_py_package_state: present
 
-
 ##
 # Docker Users
 ##
@@ -178,12 +176,11 @@ docker_py_package_state: present
 docker_group_name: "docker"
 
 # List of the users in the Docker group
+# if ansible_user is not defined, we default to the ansible ansible_user_id fact
 docker_group_users:
-  - "{{ ansible_user | default(ansible_user_id) }}"  # if ansible_user is not defined, we default to the ansible ansible_user_id fact
-
+  - "{{ ansible_user | default(ansible_user_id) }}" 
 docker_architecture:
   x86_64: "amd64"
-
 
 ##
 # Docker CE stable release repository
@@ -224,14 +221,11 @@ docker_repo_ce_nightly:
   apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
   apt_gpg_key_id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
 
-
 # Repository to be used for the installation of the packages
 docker_repo: "{{ docker_repo_ce_stable }}"
 
-
 # Name of the SSH Deamon
 docker_ssh_daemon: sshd
-
 
 docker_python_sni_pip_dependencies:
   - pyopenssl
