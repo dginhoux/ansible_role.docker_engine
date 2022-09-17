@@ -1,18 +1,18 @@
 ---
 - block:
     - name: prefix the containerd package version with the correct separator on redhat
-      set_fact:
+      ansible.builtin.set_fact:
         _containerd_package_version: "-{{ containerd_package_version }}"
       when: ansible_os_family == 'RedHat'
 
     - name: prefix the containerd package version with the correct separator on debian
-      set_fact:
+      ansible.builtin.set_fact:
         _containerd_package_version: "={{ containerd_package_version }}"
       when: ansible_os_family == 'Debian'
   when: containerd_package_version | length > 0
 
 - name: install containerd
-  package:
+  ansible.builtin.package:
     name: "{{ containerd_package_name }}{{ _containerd_package_version | default('') }}"
     state: "{{ containerd_package_state }}"
 #   when: ansible_os_family != 'RedHat'
@@ -20,25 +20,25 @@
 #         (ansible_os_family == 'RedHat' and ansible_distribution_major_version != '8')
 
 # - name: install containerd on redhat 8
-#   package:
+#   ansible.builtin.package:
 #     name: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm"
 #     state: "{{ containerd_package_state }}"
 #   when: ansible_os_family == 'RedHat' and ansible_distribution_major_version == '8'
 
 - block:
     - name: create the systemd overrides directory for containerd
-      file:
+      ansible.builtin.file:
         name: "/etc/systemd/system/containerd.service.d"
         state: directory
 
     - name: override the systemd unit for containerd
-      template:
+      ansible.builtin.template:
         src: containerd-override.conf.j2
         dest: "/etc/systemd/system/containerd.service.d/override.conf"
       register: _containerd_systemd_override
 
     - name: reload systemd and restart containerd
-      service:
+      ansible.builtin.service:
         name: containerd
         state: "{% if containerd_service_state != 'stopped' %}restarted{% else %}stopped{% endif %}"
         daemon_reload: true
@@ -48,7 +48,7 @@
     ansible_service_mgr == 'systemd'
 
 - name: enable the containerd daemon service and start it
-  service:
+  ansible.builtin.service:
     name: containerd
     state: "{{ containerd_service_state }}"
     enabled: "{{ containerd_service_enabled }}"

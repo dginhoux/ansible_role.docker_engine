@@ -3,17 +3,17 @@
 
 - block:
     # install the docker repository
-    - include_tasks:
+    - ansible.builtin.include_tasks:
         file: "tasks/sub-tasks/repo-{{ ansible_os_family }}.yml"
       when: not docker_engine_skip_repo
 
     # install python-pip
-    - include_tasks:
+    - ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-python-pip.yml
 
     # install the docker dependencies
     - name: install docker dependencies
-      package:
+      ansible.builtin.package:
         name: "{{ docker_dependencies }}"
         state: present
       when: not docker_engine_skip_containerd 
@@ -21,27 +21,27 @@
             not docker_engine_skip_engine
 
     # install containerd
-    - include_tasks:
+    - ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-containerd.yml
       when: not docker_engine_skip_containerd
 
     # install the docker engine
-    - include_tasks:
+    - ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-engine.yml
       when: not docker_engine_skip_engine
 
     # install the docker cli
-    - include_tasks:
+    - ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-cli.yml
       when: not docker_engine_skip_cli
 
     # adds the docker admin users to the docker group
-    - include_tasks:
+    - ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-group.yml
       when: not docker_engine_skip_group
 
     # install docker-py
-    - include_tasks:
+    - ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-py.yml
       when: not docker_engine_skip_docker_py
   when: docker_deploy_action == "install"
@@ -49,7 +49,7 @@
 
 - block:
     - name: remove docker engine
-      package:
+      ansible.builtin.package:
         name: "{{ item }}"
         state: absent
       with_items:

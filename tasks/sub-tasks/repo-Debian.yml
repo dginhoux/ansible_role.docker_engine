@@ -1,12 +1,12 @@
 ---
 - name: update apt cache
-  apt:
+  ansible.builtin.apt:
     update_cache: true
   changed_when: false
 
 - block:
     - name: install the python sni support packages
-      package:
+      ansible.builtin.package:
         name: "{{ docker_python_sni_pip_dependencies }}"
         state: present
 
@@ -14,7 +14,7 @@
     # Python version prior to 2.7.9. SNI support is needed by the Ansible
     # apt_key module.
     - name: Install the Python SNI python-pip dependencies.
-      pip:
+      ansible.builtin.pip:
         name: "{{ docker_python_sni_pip_dependencies }}"
         state: present
   when: ansible_python_version is version_compare('2.6.0', '>=')
@@ -22,7 +22,7 @@
     ansible_python_version is version_compare('2.7.9', '<')
 
 - name: install apt-transport-https and gnupg if necessary
-  apt:
+  ansible.builtin.apt:
     name:
       - apt-transport-https
       - gnupg

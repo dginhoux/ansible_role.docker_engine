@@ -1,6 +1,6 @@
 ---
 - name: install epel-release
-  package:
+  ansible.builtin.package:
     name: "epel-release"
     state: present
   when:
@@ -12,7 +12,7 @@
 # sure epel-release is configured on the host
 # before installing the python-pip package
 - name: install python-pip
-  package:
+  ansible.builtin.package:
     name: "{{ docker_python_pip_packages }}"
     state: present
   when:

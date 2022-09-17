@@ -1,6 +1,6 @@
 ---
 - name: install yum-utils if necessary
-  yum:
+  ansible.builtin.yum:
     name: yum-utils
     state: present
 
