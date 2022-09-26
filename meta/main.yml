@@ -3,9 +3,9 @@
 galaxy_info:
   role_name: docker_engine
   description: install and configure docker engine
-  author: dginhoux
-  company: ginhouxnet
-  license: BSD
+  author: Dany GINHOUX
+  company: dginhoux
+  license: MIT
   min_ansible_version: "2.12"
   platforms:
     - name: Debian
