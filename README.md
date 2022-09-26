@@ -110,17 +110,18 @@ Those variables are located in `vars/*.yml` are used to handle OS differences ; 
 runtime using the `include_vars` module and set OS specifics variable's.
 
 
-Variables loaded from `vars/debian.yml` : 
-| Variable Name | Value |
-|---------------|-------|
-| docker_python_pip_packages | - python-pip<br /> |
-| docker_dependencies | []<br /> |
 
-Variables loaded from `vars/redhat.yml` : 
-| Variable Name | Value |
-|---------------|-------|
-| docker_python_pip_packages | - '{% if ansible_python_version is version_compare(''3.0.0'', ''<'') %}python-pip{%<br />  else %}python3-pip{% endif %}'<br /> |
-| docker_dependencies | - xfsprogs<br /> |
+```yaml
+{'docker_python_pip_packages': '- python-pip\n', 'docker_dependencies': '[]\n'}
+```
+    
+
+
+```yaml
+{'docker_python_pip_packages': "- '{% if ansible_python_version is version_compare(''3.0.0'', ''<'') %}python-pip{%\n  else %}python3-pip{% endif %}'\n", 'docker_dependencies': '- xfsprogs\n'}
+```
+    
+
 
 
 
