@@ -152,7 +152,7 @@ runtime using the `include_vars` module and set OS specifics variable's.
   {% for role_vars_file in role_vars_files %}
 
     {% if role_vars_file['content'] != None %}
-```yaml
+```json
 {{ role_vars_file['content'] | replace('\n','<br />') }}
 ```
 {# 

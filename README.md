@@ -111,13 +111,13 @@ runtime using the `include_vars` module and set OS specifics variable's.
 
 
 
-```yaml
+```json
 {'docker_python_pip_packages': '- python-pip\n', 'docker_dependencies': '[]\n'}
 ```
     
 
 
-```yaml
+```json
 {'docker_python_pip_packages': "- '{% if ansible_python_version is version_compare(''3.0.0'', ''<'') %}python-pip{%\n  else %}python3-pip{% endif %}'\n", 'docker_dependencies': '- xfsprogs\n'}
 ```
     
