@@ -1,17 +1,21 @@
-# :computer: ROLE dginhoux.docker_engine
-
-## :scroll: DESCRIPTION
-
-This ansible role install, configure and uninstall docker engine<br />
+# ROLE dginhoux.docker_engine
 
 
-## :nut_and_bolt: REQUIREMENTS
+
+## DESCRIPTION
+
+This ansible role install, configure and uninstall docker-engine<br />
+It grab the binary from github repository.
+
+
+
+## REQUIREMENTS
 
 #### SUPPORTED PLATFORMS
 
-This role require a supported platform. <br />
-It will skip node with unsupported platform to avoid any compatibility problem. <br />
-This behaviour can be bypassed by settings this variable `asserts_bypass=True`.
+This role require a supported platform.<br />
+It will skip node with unsupported platform to avoid any compatibility problem.<br />
+This behaviour can be bypassed by settings the following variable `asserts_bypass=True`.
 
 | Platform | Versions |
 |----------|----------|
@@ -19,25 +23,23 @@ This behaviour can be bypassed by settings this variable `asserts_bypass=True`.
 | Fedora | 33, 34, 35, 36 |
 | EL | 7, 8 |
 
-
 #### ANSIBLE VERSION
 
 Ansible >= 2.12
-
 
 #### DEPENDENCIES
 
 None.
 
 
-## :inbox_tray: INSTALLATION
+
+## INSTALLATION
 
 #### ANSIBLE GALAXY
 
 ```shell
 ansible-galaxy install dginhoux.docker_engine
 ```
-
 #### GIT
 
 ```shell
@@ -45,94 +47,291 @@ git clone https://github.com/dginhoux/ansible_role.docker_engine dginhoux.docker
 ```
 
 
-## :rocket: USAGE
+## USAGE
 
 #### EXAMPLE PLAYBOOK
 
 ```yaml
 - hosts: all
-  become: true
-  gather_facts: true
-
-  tasks:
+  roles:
     - name: start role dginhoux.docker_engine
       ansible.builtin.include_role:
         name: dginhoux.docker_engine
 ```
 
 
-## :factory: VARIABLES
+## VARIABLES
+
 #### DEFAULT VARIABLES
-      
-Role default variables from `defaults/main.yml` : 
 
-| Variable Name | Value |
-|---------------|-------|
-| docker_deploy_action | install |
-| docker_engine_skip_repo | False |
-| docker_engine_skip_containerd | False |
-| docker_engine_skip_engine | False |
-| docker_engine_skip_cli | False |
-| docker_engine_skip_group | False |
-| docker_engine_skip_docker_py | False |
-| docker_package_name | docker-ce |
-| docker_package_version |  |
-| docker_package_state | present |
-| docker_service_override | [Unit]<br />Description=Docker Application Container Engine<br />Documentation=https://docs.docker.com<br />After=network-online.target firewalld.service containerd.service<br />Wants=network-online.target<br />Requires=docker.socket containerd.service<br />[Service]<br />Type=notify<br /># the default is not to use systemd for cgroups because the delegate issues still<br /># exists and systemd currently does not support the cgroup feature set required<br /># for containers run by docker<br /># ExecStart=/usr/bin/dockerd -H fd:// -H tcp://127.0.0.1:2375 --containerd=/run/containerd/containerd.sock<br />ExecStart=<br />ExecStart=/usr/bin/dockerd --containerd=/run/containerd/containerd.sock<br />ExecReload=/bin/kill -s HUP $MAINPID<br />TimeoutSec=0<br />RestartSec=2<br />Restart=always<br /># Note that StartLimit* options were moved from "Service" to "Unit" in systemd 229.<br /># Both the old, and new location are accepted by systemd 229 and up, so using the old location<br /># to make them work for either version of systemd.<br />StartLimitBurst=3<br /># Note that StartLimitInterval was renamed to StartLimitIntervalSec in systemd 230.<br /># Both the old, and new name are accepted by systemd 230 and up, so using the old name to make<br /># this option work for either version of systemd.<br />StartLimitInterval=60s<br /># Having non-zero Limit*s causes performance problems due to accounting overhead<br /># in the kernel. We recommend using cgroups to do container-local accounting.<br />LimitNOFILE=infinity<br />LimitNPROC=infinity<br />LimitCORE=infinity<br /># Comment TasksMax if your systemd version does not support it.<br /># Only systemd 226 and above support this option.<br />TasksMax=infinity<br /># set delegate yes so that systemd does not reset the cgroups of docker containers<br />Delegate=yes<br /># kill only the docker process, not all processes in the cgroup<br />KillMode=process<br />OOMScoreAdjust=-500<br />[Install]<br />WantedBy=multi-user.target<br /> |
-| docker_service_state | started |
-| docker_service_enabled | yes |
-| docker_daemon_config | default-shm-size: 64M<br />experimental: true<br />hosts:<br />- unix:///var/run/docker.sock<br />icc: false<br />iptables: true<br />ipv6: false<br />log-level: warn<br />metrics-addr: 127.0.0.1:9323<br />selinux-enabled: false<br />shutdown-timeout: 90<br />tls: false<br />userland-proxy: false<br /> |
-| docker_cli_package_name | docker-ce-cli |
-| docker_cli_package_version |  |
-| docker_cli_package_state | present |
-| containerd_package_name | containerd.io |
-| containerd_package_version |  |
-| containerd_package_state | present |
-| containerd_service_override | [Service]<br />ExecStartPre=<br /> |
-| containerd_service_state | started |
-| containerd_service_enabled | yes |
-| docker_py_package_name | docker |
-| docker_py_package_version |  |
-| docker_py_package_state | present |
-| docker_group_name | docker |
-| docker_group_users | - '{{ ansible_user  \| default(ansible_user_id) }}'<br /> |
-| docker_architecture | x86_64: amd64<br /> |
-| docker_repo_ce_stable | apt_gpg_key: https://download.docker.com/linux/{{ ansible_distribution  \| lower }}/gpg<br />apt_gpg_key_id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88<br />apt_repo: deb [arch={{ docker_architecture[ansible_architecture] }}] https://download.docker.com/linux/{{<br />  ansible_distribution  \| lower }} {{ ansible_distribution_release }} stable<br />name: docker_ce_stable<br />yum_gpg_check: 'yes'<br />yum_gpg_key: https://download.docker.com/linux/centos/gpg<br />yum_repo: https://download.docker.com/linux/centos/7/$basearch/stable<br /> |
-| docker_repo_ce_edge | apt_gpg_key: https://download.docker.com/linux/{{ ansible_distribution  \| lower }}/gpg<br />apt_gpg_key_id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88<br />apt_repo: deb [arch={{ docker_architecture[ansible_architecture] }}] https://download.docker.com/linux/{{<br />  ansible_distribution  \| lower }} {{ ansible_distribution_release }} edge<br />name: docker_ce_edge<br />yum_gpg_check: 'yes'<br />yum_gpg_key: https://download.docker.com/linux/centos/gpg<br />yum_repo: https://download.docker.com/linux/centos/7/$basearch/edge<br /> |
-| docker_repo_ce_test | apt_gpg_key: https://download.docker.com/linux/{{ ansible_distribution  \| lower }}/gpg<br />apt_gpg_key_id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88<br />apt_repo: deb [arch={{ docker_architecture[ansible_architecture] }}] https://download.docker.com/linux/{{<br />  ansible_distribution  \| lower }} {{ ansible_distribution_release }} test<br />name: docker_ce_test<br />yum_gpg_check: 'yes'<br />yum_gpg_key: https://download.docker.com/linux/centos/gpg<br />yum_repo: https://download.docker.com/linux/centos/7/$basearch/test<br /> |
-| docker_repo_ce_nightly | apt_gpg_key: https://download.docker.com/linux/{{ ansible_distribution  \| lower }}/gpg<br />apt_gpg_key_id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88<br />apt_repo: deb [arch={{ docker_architecture[ansible_architecture] }}] https://download.docker.com/linux/{{<br />  ansible_distribution  \| lower }} {{ ansible_distribution_release }} nightly<br />name: docker_ce_nightly<br />yum_gpg_check: 'yes'<br />yum_gpg_key: https://download.docker.com/linux/centos/gpg<br />yum_repo: https://download.docker.com/linux/centos/7/$basearch/nightly<br /> |
-| docker_repo | {{ docker_repo_ce_stable }} |
-| docker_ssh_daemon | sshd |
-| docker_python_sni_pip_dependencies | - pyopenssl<br />- ndg-httpsclient<br />- pyasn1<br /> |
+Defaults variables defined in `defaults/main.yml` : 
+
+```yaml
+docker_deploy_action: install
+# docker_deploy_action: uninstall
+
+##
+# Role Switches
+##
+# Switches disabling the docker-engine, docker group and swarm-mode setup.
+# if true, skips the setup of the docker repository
+docker_engine_skip_repo: false
+# if true, skips the setup of containerd
+docker_engine_skip_containerd: false
+# if true, skips the docker engine installation
+docker_engine_skip_engine: false
+# if true, skips the docker cli installation
+docker_engine_skip_cli: false
+# if true, do not add the docker_admin_users to the docker_group_name
+docker_engine_skip_group: false
+# if true, skips the installation of docker-py
+docker_engine_skip_docker_py: false
+
+##
+# Docker
+##
+# Name of the package providing Docker
+docker_package_name: "docker-ce"
+
+# Version of the Docker package to be installed.
+# By default, the latest available version will be installed.
+docker_package_version: ""
+
+# Installation state of the Docker package.
+# Set it to 'latest' to upgrade Docker to the latest version.
+docker_package_state: present
+
+# Extra packages that have to be installed together with Docker
+# e.g. linux-image-extra-virtual on some Debian systems
+# docker_dependencies: "{{ default_docker_dependencies }}"
+
+# Contect written to the systemd unit drop-in overriding
+# the default Docker service definition.
+# docker_service_override: ""
+# docker_service_override: |
+# [Service]
+# ExecStart=
+# ExecStart=/usr/bin/dockerd
+docker_service_override: |
+  [Unit]
+  Description=Docker Application Container Engine
+  Documentation=https://docs.docker.com
+  After=network-online.target firewalld.service containerd.service
+  Wants=network-online.target
+  Requires=docker.socket containerd.service
+  [Service]
+  Type=notify
+  # the default is not to use systemd for cgroups because the delegate issues still
+  # exists and systemd currently does not support the cgroup feature set required
+  # for containers run by docker
+  # ExecStart=/usr/bin/dockerd -H fd:// -H tcp://127.0.0.1:2375 --containerd=/run/containerd/containerd.sock
+  ExecStart=
+  ExecStart=/usr/bin/dockerd --containerd=/run/containerd/containerd.sock
+  ExecReload=/bin/kill -s HUP $MAINPID
+  TimeoutSec=0
+  RestartSec=2
+  Restart=always
+  # Note that StartLimit* options were moved from "Service" to "Unit" in systemd 229.
+  # Both the old, and new location are accepted by systemd 229 and up, so using the old location
+  # to make them work for either version of systemd.
+  StartLimitBurst=3
+  # Note that StartLimitInterval was renamed to StartLimitIntervalSec in systemd 230.
+  # Both the old, and new name are accepted by systemd 230 and up, so using the old name to make
+  # this option work for either version of systemd.
+  StartLimitInterval=60s
+  # Having non-zero Limit*s causes performance problems due to accounting overhead
+  # in the kernel. We recommend using cgroups to do container-local accounting.
+  LimitNOFILE=infinity
+  LimitNPROC=infinity
+  LimitCORE=infinity
+  # Comment TasksMax if your systemd version does not support it.
+  # Only systemd 226 and above support this option.
+  TasksMax=infinity
+  # set delegate yes so that systemd does not reset the cgroups of docker containers
+  Delegate=yes
+  # kill only the docker process, not all processes in the cgroup
+  KillMode=process
+  OOMScoreAdjust=-500
+  [Install]
+  WantedBy=multi-user.target
+
+# State of the Docker deamon service
+docker_service_state: "started"
+
+# Whether the Docker service should start on boot
+docker_service_enabled: "yes"
+
+# Docker Deamon configuration
+# docker_daemon_config: {}
+docker_daemon_config:
+  default-shm-size: 64M
+  experimental: true
+  hosts:
+    # - tcp://0.0.0.0:2375
+    - unix:///var/run/docker.sock
+  icc: false
+  iptables: true
+  ipv6: false
+  # live-restore: true
+  # log-driver: json-file
+  # log-opts:
+  #   cache-disabled: "false"
+  #   max-size: 10m
+  #   max-file: 10
+  log-level: warn
+  metrics-addr: "127.0.0.1:9323"
+  selinux-enabled: false
+  userland-proxy: false
+  tls: false
+  shutdown-timeout: 90
+
+##
+# Docker CLI
+##
+# Name of the package providing the Docker CLI
+docker_cli_package_name: "docker-ce-cli"
+
+# Version of the Docker CLI package to be installed.
+docker_cli_package_version: ""
+
+# Installation state of the Docker CLI package.
+# Set it to 'latest' to upgrade the Docker CLI to the latest version.
+docker_cli_package_state: present
+
+##
+# Containerd
+##
+# Name of the package providing containerd
+containerd_package_name: "containerd.io"
+
+# Version of the containerd package to be installed.
+# By default, the latest available version will be installed.
+containerd_package_version: ""
+
+# Installation state of the containerd package.
+# Set it to 'latest' to upgrade containerd to the latest version.
+containerd_package_state: present
+
+# Contect written to the systemd unit drop-in overriding
+# the default containerd service definition.
+containerd_service_override: |
+  [Service]
+  ExecStartPre=
+
+# State of the containerd service
+containerd_service_state: "started"
+
+# Whether the containerd service should start on boot
+containerd_service_enabled: "yes"
+
+##
+# Docker-py
+##
+# Name of the python-pip package providing docker-py
+docker_py_package_name: "docker"
+
+# Version of the docker-py package to be installed.
+docker_py_package_version: ""
+
+# Installation state of the docker-py package.
+# Set it to 'latest' to upgrade the Docker CLI to the latest version.
+docker_py_package_state: present
+
+##
+# Docker Users
+##
+# Name of the Docker group
+docker_group_name: "docker"
+
+# List of the users in the Docker group
+# if ansible_user is not defined, we default to the ansible ansible_user_id fact
+docker_group_users:
+  - "{{ ansible_user | default(ansible_user_id) }}" 
+docker_architecture:
+  x86_64: "amd64"
+
+##
+# Docker CE stable release repository
+##
+docker_repo_ce_stable:
+  name: "docker_ce_stable"
+  yum_repo: "https://download.docker.com/linux/centos/7/$basearch/stable"
+  yum_gpg_key: "https://download.docker.com/linux/centos/gpg"
+  yum_gpg_check: "yes"
+  apt_repo: "deb [arch={{ docker_architecture[ansible_architecture] }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+  apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+  apt_gpg_key_id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+# Docker CE edge release repository
+docker_repo_ce_edge:
+  name: "docker_ce_edge"
+  yum_repo: "https://download.docker.com/linux/centos/7/$basearch/edge"
+  yum_gpg_key: "https://download.docker.com/linux/centos/gpg"
+  yum_gpg_check: "yes"
+  apt_repo: "deb [arch={{ docker_architecture[ansible_architecture] }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} edge"
+  apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+  apt_gpg_key_id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+# Docker CE test release repository
+docker_repo_ce_test:
+  name: "docker_ce_test"
+  yum_repo: "https://download.docker.com/linux/centos/7/$basearch/test"
+  yum_gpg_key: "https://download.docker.com/linux/centos/gpg"
+  yum_gpg_check: "yes"
+  apt_repo: "deb [arch={{ docker_architecture[ansible_architecture] }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} test"
+  apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+  apt_gpg_key_id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+# Docker CE nightly release repository
+docker_repo_ce_nightly:
+  name: "docker_ce_nightly"
+  yum_repo: "https://download.docker.com/linux/centos/7/$basearch/nightly"
+  yum_gpg_key: "https://download.docker.com/linux/centos/gpg"
+  yum_gpg_check: "yes"
+  apt_repo: "deb [arch={{ docker_architecture[ansible_architecture] }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} nightly"
+  apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+  apt_gpg_key_id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+
+# Repository to be used for the installation of the packages
+docker_repo: "{{ docker_repo_ce_stable }}"
+
+# Name of the SSH Deamon
+docker_ssh_daemon: sshd
+
+docker_python_sni_pip_dependencies:
+  - pyopenssl
+  - ndg-httpsclient
+  - pyasn1
+```
+
+#### DEFAULT OS SPECIFIC VARIABLES
+
+Those variables files are located in `vars/*.yml` are used to handle OS differences.<br />
+One of theses is loaded dynamically during role runtime using the `include_vars` module and set OS specifics variable's.
+
+* RedHat family
+```yaml
+docker_python_pip_packages:
+  - "{% if ansible_python_version is version_compare('3.0.0', '<') %}python-pip{% else %}python3-pip{% endif %}"
+
+docker_dependencies:
+  # See https://github.com/moby/moby/issues/26054
+  - xfsprogs
+```
+
+* Debian family
+```yaml
+docker_python_pip_packages:
+  - python-pip
+
+docker_dependencies: []
+```
 
 
-#### CONTEXT VARIABLES
 
-Those variables are located in `vars/*.yml` are used to handle OS differences ; One of theses is loaded dynamically during role
-runtime using the `include_vars` module and set OS specifics variable's.
+## AUTHOR
 
-* Variables loaded from `vars/debian.yml` : 
-
-| Variable Name | Value |
-|---------------|-------|
-| docker_python_pip_packages | - python-pip<br /> |
-| docker_dependencies | []<br /> |
-
-* Variables loaded from `vars/redhat.yml` : 
-
-| Variable Name | Value |
-|---------------|-------|
-| docker_python_pip_packages | - '{% if ansible_python_version is version_compare(''3.0.0'', ''<'') %}python-pip{%<br />  else %}python3-pip{% endif %}'<br /> |
-| docker_dependencies | - xfsprogs<br /> |
+Dany GINHOUX - https://github.com/dginhoux
 
 
 
+## LICENSE
 
-## :man: AUTHOR
-
-[![Author](https://img.shields.io/badge/maintained%20by-dginhoux-e00000?style=flat-square)](https://github.com/dginhoux)
-
-
-## :bookmark_tabs: LICENSE
-
-[![License](https://img.shields.io/github/license/dginhoux/ansible_role.docker_engine?style=flat-square)](https://github.com/dginhoux/ansible_role.docker_engine/blob/master/LICENSE)
+MIT
