@@ -150,21 +150,14 @@ Role default variables from `defaults/{{role_defaults_file['filename']}}` :
 Those variables are located in `vars/*.yml` are used to handle OS differences ; One of theses is loaded dynamically during role
 runtime using the `include_vars` module and set OS specifics variable's.
   {% for role_vars_file in role_vars_files %}
-
     {% if role_vars_file['content'] != None %}
-```json
-{{ role_vars_file['content'] | replace('\n','<br />') }}
-```
-{# 
 Variables loaded from `vars/{{role_vars_file['filename']}}` : 
 | Variable Name | Value |
 |---------------|-------|
       {% for key, value in role_vars_file['content'].items() %}
 | {{ key }} | {{ value | safe | replace('|',' \|') | replace('\n','<br />') }} |
       {% endfor %}
-#}    
     {% endif %}
-
   {% endfor %}
   {% else %}
 None.
