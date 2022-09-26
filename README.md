@@ -64,6 +64,7 @@ git clone https://github.com/dginhoux/ansible_role.docker_engine dginhoux.docker
 ## :factory: VARIABLES
 #### DEFAULT VARIABLES
 Role default variables from `defaults/main.yml` : 
+
 | Variable Name | Value |
 |---------------|-------|
 | docker_deploy_action | install |
@@ -109,11 +110,13 @@ Role default variables from `defaults/main.yml` :
 Those variables are located in `vars/*.yml` are used to handle OS differences ; One of theses is loaded dynamically during role
 runtime using the `include_vars` module and set OS specifics variable's.
 Variables loaded from `vars/debian.yml` : 
+
 | Variable Name | Value |
 |---------------|-------|
 | docker_python_pip_packages | - python-pip<br /> |
 | docker_dependencies | []<br /> |
 Variables loaded from `vars/redhat.yml` : 
+
 | Variable Name | Value |
 |---------------|-------|
 | docker_python_pip_packages | - '{% if ansible_python_version is version_compare(''3.0.0'', ''<'') %}python-pip{%<br />  else %}python3-pip{% endif %}'<br /> |

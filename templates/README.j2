@@ -132,6 +132,7 @@ on how runtime context may affects role execution.
     {% else %}
       {% for role_defaults_file in role_defaults_files %}
 Role default variables from `defaults/{{role_defaults_file['filename']}}` : 
+
         {% if role_defaults_file['content'] != None %}
 | Variable Name | Value |
 |---------------|-------|
@@ -152,6 +153,7 @@ runtime using the `include_vars` module and set OS specifics variable's.
   {% for role_vars_file in role_vars_files %}
     {% if role_vars_file['content'] != None %}
 Variables loaded from `vars/{{role_vars_file['filename']}}` : 
+
 | Variable Name | Value |
 |---------------|-------|
       {% for key, value in role_vars_file['content'].items() %}
