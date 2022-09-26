@@ -19,7 +19,7 @@
 
 ## :scroll: DESCRIPTION
 
-{{ role_meta_vars['galaxy_info']['description'] }}
+{{ role_meta_vars['galaxy_info']['description'] | replace('\n','<br>') }}
 
 
 ## :nut_and_bolt: REQUIREMENTS
@@ -78,16 +78,21 @@ git clone {{ repo_url }} {{ role_company }}.{{ role_name }}
 
 ```yaml
 - hosts: all
-  roles:
+  become: true
+  gather_facts: true
+
+  tasks:
     - name: start role {{ role_company }}.{{ role_name }}
       ansible.builtin.include_role:
         name: {{ role_company }}.{{ role_name }}
-{% if role_defaults_files |length > 0 and role_defaults_files[0]['content'] is not none %}
+{#
+  {% if role_defaults_files |length > 0 and role_defaults_files[0]['content'] is not none %}
       vars:
   {% for string_role_defaults_file in string_role_defaults_files %}
         {{ string_role_defaults_file['content'] | replace ('\n', '\n        ') }}
   {% endfor %}
 {% endif %}
+#}
 ```
 
 
@@ -127,12 +132,11 @@ on how runtime context may affects role execution.
     {% else %}
       {% for role_defaults_file in role_defaults_files %}
 Role default variables from `defaults/{{role_defaults_file['filename']}}` : 
-
         {% if role_defaults_file['content'] != None %}
 | Variable Name | Value |
 |---------------|-------|
           {% for key, value in role_defaults_file['content'].items() %}
-|{{ key }} | <pre> {{ value | replace('|',' \|') | replace('\n','<br>') }} </pre> |
+| {{ key }} | {{ value|safe | replace('|',' \|')|replace('\n','<br>') }} |
           {% endfor %}
         {% endif %}
       {% endfor %}
@@ -149,7 +153,6 @@ runtime using the `include_vars` module and set OS specifics variable's.
 
     {% if role_vars_file['content'] != None %}
 Variables loaded from `vars/{{role_vars_file['filename']}}` : 
-
 | Variable Name | Value |
 |---------------|-------|
       {% for key,value in role_vars_file['content'].items() %}
