@@ -4,8 +4,7 @@
 
 ## DESCRIPTION
 
-This ansible role install, configure and uninstall docker-engine<br />
-It grab the binary from github repository.
+This ansible role install, configure and uninstall docker-engine.<br />
 
 
 

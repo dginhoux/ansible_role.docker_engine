@@ -2,7 +2,8 @@
 
 galaxy_info:
   role_name: docker_engine
-  description: dginhoux.docker_engine
+  description: |
+    This ansible role install, configure and uninstall docker-engine.
   author: Dany GINHOUX
   company: dginhoux
   license: MIT
