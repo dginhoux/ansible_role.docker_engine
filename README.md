@@ -334,3 +334,9 @@ Dany GINHOUX - https://github.com/dginhoux
 ## LICENSE
 
 MIT
+
+
+## INSPIRED FROM
+
+This role is inspired and forked from this role https://github.com/atosatto/ansible-dockerswarm created by atosatto
+
