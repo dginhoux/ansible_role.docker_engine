@@ -1,5 +1,5 @@
 ---
 docker_python_pip_packages:
-  - python-pip
+  - python3-pip
 
 docker_dependencies: []
