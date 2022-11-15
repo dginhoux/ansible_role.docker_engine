@@ -1,5 +1,4 @@
 ---
-
 galaxy_info:
   role_name: docker_engine
   description: |
@@ -26,6 +25,5 @@ galaxy_info:
   galaxy_tags:
     - docker
     - engine
-
 
 dependencies: []

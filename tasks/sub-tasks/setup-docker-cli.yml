@@ -1,17 +1,18 @@
 ---
-- block:
-    - name: prefix the docker cli package version with the correct separator on redhat
+- name: Prefix docker cli package version
+  when: docker_cli_package_version | length > 0
+  block:
+    - name: Prefix the docker cli package version with the correct separator on redhat
       ansible.builtin.set_fact:
         _docker_cli_package_version: "-{{ docker_cli_package_version }}"
       when: ansible_os_family == 'RedHat'
 
-    - name: prefix the docker cli package version with the correct separator on debian
+    - name: Prefix the docker cli package version with the correct separator on debian
       ansible.builtin.set_fact:
         _docker_cli_package_version: "={{ docker_cli_package_version }}"
       when: ansible_os_family == 'Debian'
-  when: docker_cli_package_version | length > 0
 
-- name: install the docker cli
+- name: Install the docker cli
   ansible.builtin.package:
     name: "{{ docker_cli_package_name }}{{ _docker_cli_package_version | default('') }}"
     state: "{{ docker_cli_package_state }}"

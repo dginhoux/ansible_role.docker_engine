@@ -1,2 +1,3 @@
 ---
-- ansible.builtin.meta: reset_connection
+- name: Reset connecion
+  ansible.builtin.meta: reset_connection

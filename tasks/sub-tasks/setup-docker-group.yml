@@ -1,6 +1,6 @@
 ---
-- name: add the docker administrators to the docker group
-  user:
+- name: Add the docker administrators to the docker group
+  ansible.builtin.user:
     name: "{{ item }}"
     groups: "{{ docker_group_name }}"
     append: true
@@ -30,9 +30,13 @@
 #     and ansible_user in docker_group_users
 #     and ansible_user in (addtogroup.results | selectattr('changed') | map(attribute='item') | list)
 
-- name: reset ansible connection after group changes
+- name: Reset ansible connection after group changes
   ansible.builtin.meta: reset_connection
-  when: ansible_connection in ['ssh', 'smart']
-    and ansible_user is defined
-    and ansible_user in docker_group_users
-    and ansible_user in (addtogroup.results | selectattr('changed') | map(attribute='item') | list)
+  when: >
+        ansible_connection in ['ssh', 'smart']
+        and
+        ansible_user is defined
+        and
+        ansible_user in docker_group_users
+        and
+        ansible_user in (addtogroup.results | selectattr('changed') | map(attribute='item') | list)
