@@ -1,52 +1,56 @@
 ---
 
 - name: Install docker-engine
+  tags:
+    - install
   when: docker_deploy_action == "install"
   block:
     - name: Install the docker repository
+      when: not docker_engine_skip_repo
       ansible.builtin.include_tasks:
         file: "tasks/sub-tasks/repo-{{ ansible_os_family }}.yml"
-      when: not docker_engine_skip_repo
 
     - name: Install python-pip
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-python-pip.yml
 
     - name: Install docker dependencies
-      ansible.builtin.package:
-        name: "{{ docker_dependencies }}"
-        state: present
       when: not docker_engine_skip_containerd
             or
             not docker_engine_skip_engine
+      ansible.builtin.package:
+        name: "{{ docker_dependencies }}"
+        state: present
 
     - name: Install containerd
+      when: not docker_engine_skip_containerd
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-containerd.yml
-      when: not docker_engine_skip_containerd
 
     - name: Install the docker engine
+      when: not docker_engine_skip_engine
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-engine.yml
-      when: not docker_engine_skip_engine
 
     - name: Install the docker cli
+      when: not docker_engine_skip_cli
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-cli.yml
-      when: not docker_engine_skip_cli
 
     - name: Add the docker admin users to the docker group
+      when: not docker_engine_skip_group
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-group.yml
-      when: not docker_engine_skip_group
 
     - name: Install docker-py
+      when: not docker_engine_skip_docker_py
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-py.yml
-      when: not docker_engine_skip_docker_py
 
 
-- name: Remove docker-engine
+- name: Uninstall docker-engine
+  tags:
+    - uninstall
   when: docker_deploy_action == "uninstall"
   block:
     - name: Remove docker engine

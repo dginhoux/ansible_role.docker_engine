@@ -178,7 +178,7 @@ docker_group_name: "docker"
 # List of the users in the Docker group
 # if ansible_user is not defined, we default to the ansible ansible_user_id fact
 docker_group_users:
-  - "{{ ansible_user | default(ansible_user_id) }}" 
+  - "{{ ansible_user | default(ansible_user_id) }}"
 docker_architecture:
   x86_64: "amd64"
 
