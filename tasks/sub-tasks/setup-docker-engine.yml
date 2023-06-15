@@ -1,16 +1,19 @@
 ---
 - name: Prefix docker package version
-  when: docker_package_version | length > 0
+  when:
+    - docker_package_version | length > 0
   block:
     - name: Prefix the docker package version with the correct separator on redhat
+      when:
+        - ansible_os_family == 'RedHat'
       ansible.builtin.set_fact:
         _docker_package_version: "-{{ docker_package_version }}"
-      when: ansible_os_family == 'RedHat'
 
     - name: Prefix the docker package version with the correct separator on debian
+      when:
+        - ansible_os_family == 'Debian'
       ansible.builtin.set_fact:
         _docker_package_version: "={{ docker_package_version }}"
-      when: ansible_os_family == 'Debian'
 
 - name: Install docker
   ansible.builtin.package:
@@ -18,9 +21,9 @@
     state: "{{ docker_package_state }}"
 
 - name: Manage systemd docker engine service
-  when: docker_service_override | length > 0
-        and
-        ansible_service_mgr == 'systemd'
+  when:
+    - docker_service_override | length > 0
+    - ansible_service_mgr == 'systemd'
   block:
     - name: Create the systemd overrides directory for docker
       ansible.builtin.file:
@@ -31,20 +34,21 @@
         mode: "0755"
 
     - name: Override the systemd unit for docker
+      register: _docker_systemd_override
       ansible.builtin.template:
         src: docker-override.conf.j2
         dest: "/etc/systemd/system/docker.service.d/override.conf"
         owner: root
         group: root
         mode: "0644"
-      register: _docker_systemd_override
 
     - name: Reload systemd and restart docker
+      when: 
+        - _docker_systemd_override.changed
       ansible.builtin.service:
         name: docker
         state: "{% if docker_service_state != 'stopped' %}restarted{% else %}stopped{% endif %}"
         daemon_reload: true
-      when: _docker_systemd_override.changed
 
 - name: Make sure the docker daemon configuration directory exists
   ansible.builtin.file:
@@ -55,13 +59,13 @@
     state: directory
 
 - name: Configure the docker deamon
+  notify: restart docker
   ansible.builtin.template:
     src: docker-daemon.json.j2
     dest: /etc/docker/daemon.json
     owner: root
     group: root
     mode: "0640"
-  notify: restart docker
 
 - name: Enable the docker daemon service and start it
   ansible.builtin.service:

@@ -1,16 +1,19 @@
 ---
 - name: Prefix docker cli package version
-  when: docker_cli_package_version | length > 0
+  when:
+    - docker_cli_package_version | length > 0
   block:
     - name: Prefix the docker cli package version with the correct separator on redhat
+      when:
+        - ansible_os_family == 'RedHat'
       ansible.builtin.set_fact:
         _docker_cli_package_version: "-{{ docker_cli_package_version }}"
-      when: ansible_os_family == 'RedHat'
 
     - name: Prefix the docker cli package version with the correct separator on debian
+      when:
+        - ansible_os_family == 'Debian'
       ansible.builtin.set_fact:
         _docker_cli_package_version: "={{ docker_cli_package_version }}"
-      when: ansible_os_family == 'Debian'
 
 - name: Install the docker cli
   ansible.builtin.package:
