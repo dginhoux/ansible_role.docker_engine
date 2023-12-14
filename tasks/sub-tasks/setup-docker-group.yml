@@ -1,7 +1,7 @@
 ---
 - name: Add the docker administrators to the docker group
-  register: addtogroup
   become: true
+  register: addtogroup
   with_items: "{{ docker_group_users }}"
   ansible.builtin.user:
     name: "{{ item }}"

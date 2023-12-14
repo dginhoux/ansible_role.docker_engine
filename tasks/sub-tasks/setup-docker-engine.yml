@@ -16,6 +16,7 @@
         _docker_package_version: "={{ docker_package_version }}"
 
 - name: Install docker
+  become: true
   ansible.builtin.package:
     name: "{{ docker_package_name }}{{ _docker_package_version | default('') }}"
     state: "{{ docker_package_state }}"
@@ -26,6 +27,7 @@
     - ansible_service_mgr == 'systemd'
   block:
     - name: Create the systemd overrides directory for docker
+      become: true
       ansible.builtin.file:
         name: "/etc/systemd/system/docker.service.d"
         state: directory
@@ -34,6 +36,7 @@
         mode: "0755"
 
     - name: Override the systemd unit for docker
+      become: true
       register: _docker_systemd_override
       ansible.builtin.template:
         src: docker-override.conf.j2
@@ -43,6 +46,7 @@
         mode: "0644"
 
     - name: Reload systemd and restart docker
+      become: true
       when: 
         - _docker_systemd_override.changed
       ansible.builtin.service:
@@ -51,6 +55,7 @@
         daemon_reload: true
 
 - name: Make sure the docker daemon configuration directory exists
+  become: true
   ansible.builtin.file:
     path: /etc/docker
     owner: root
@@ -59,6 +64,7 @@
     state: directory
 
 - name: Configure the docker deamon
+  become: true
   notify: restart docker
   ansible.builtin.template:
     src: docker-daemon.json.j2
@@ -68,6 +74,7 @@
     mode: "0640"
 
 - name: Enable the docker daemon service and start it
+  become: true
   ansible.builtin.service:
     name: docker
     state: "{{ docker_service_state }}"

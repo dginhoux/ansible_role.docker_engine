@@ -15,6 +15,7 @@
         file: tasks/sub-tasks/setup-python-pip.yml
 
     - name: Install docker dependencies
+      become: true
       when: not docker_engine_skip_containerd
             or
             not docker_engine_skip_engine
@@ -54,6 +55,7 @@
   when: docker_deploy_action == "uninstall"
   block:
     - name: Remove docker engine
+      become: true
       ansible.builtin.package:
         name: "{{ item }}"
         state: absent
@@ -63,6 +65,7 @@
         - "{{ containerd_package_name }}"
 
     - name: Remove group
+      become: true
       ansible.builtin.group:
         name: "{{ docker_group_name }}"
         state: absent

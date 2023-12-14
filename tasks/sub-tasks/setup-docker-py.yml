@@ -1,5 +1,6 @@
 ---
 - name: Install docker-py
+  become: true
   ansible.builtin.pip:
     name: "{{ docker_py_package_name }}"
     version: "{{ docker_py_package_version }}"

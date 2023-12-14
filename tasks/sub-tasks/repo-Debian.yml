@@ -1,5 +1,6 @@
 ---
 - name: Update apt cache
+  become: true
   ansible.builtin.apt:
     update_cache: true
 
@@ -21,6 +22,7 @@
 #     ansible_python_version is version_compare('2.7.9', '<')
 
 - name: Install apt-transport-https and gnupg if necessary
+  become: true
   ansible.builtin.apt:
     name:
       - apt-transport-https
@@ -28,12 +30,14 @@
     state: present
 
 - name: Import docker apt public key
+  become: true
   ansible.builtin.apt_key:
     url: "{{ docker_repo['apt_gpg_key'] }}"
     id: "{{ docker_repo['apt_gpg_key_id'] | default('') }}"
     state: present
 
 - name: Add the docker apt repository
+  become: true
   ansible.builtin.apt_repository:
     repo: "{{ docker_repo['apt_repo'] }}"
     filename: "{{ docker_repo['name'] }}"

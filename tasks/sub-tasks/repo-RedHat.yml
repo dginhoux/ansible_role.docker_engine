@@ -1,10 +1,12 @@
 ---
 - name: Install yum-utils if necessary
+  become: true
   ansible.builtin.yum:
     name: yum-utils
     state: present
 
 - name: Add the yum docker repository
+  become: true
   ansible.builtin.yum_repository:
     name: "{{ docker_repo['name'] }}"
     file: "{{ docker_repo['name'] }}"

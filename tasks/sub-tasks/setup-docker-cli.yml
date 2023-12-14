@@ -16,6 +16,7 @@
         _docker_cli_package_version: "={{ docker_cli_package_version }}"
 
 - name: Install the docker cli
+  become: true
   ansible.builtin.package:
     name: "{{ docker_cli_package_name }}{{ _docker_cli_package_version | default('') }}"
     state: "{{ docker_cli_package_state }}"

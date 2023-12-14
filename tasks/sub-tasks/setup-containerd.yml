@@ -16,6 +16,7 @@
         _containerd_package_version: "={{ containerd_package_version }}"
 
 - name: Install containerd
+  become: true
   ansible.builtin.package:
     name: "{{ containerd_package_name }}{{ _containerd_package_version | default('') }}"
     state: "{{ containerd_package_state }}"
@@ -35,6 +36,7 @@
     - ansible_service_mgr == 'systemd'
   block:
     - name: Create the systemd overrides directory for containerd
+      become: true
       ansible.builtin.file:
         name: "/etc/systemd/system/containerd.service.d"
         state: directory
@@ -43,6 +45,7 @@
         mode: "0755"
 
     - name: Override the systemd unit for containerd
+      become: true
       register: _containerd_systemd_override
       ansible.builtin.template:
         src: containerd-override.conf.j2
@@ -52,6 +55,7 @@
         mode: "0644"
 
     - name: Reload systemd and restart containerd
+      become: true
       when:
         - _containerd_systemd_override.changed
       ansible.builtin.service:
@@ -60,6 +64,7 @@
         daemon_reload: true
 
 - name: Enable the containerd daemon service and start it
+  become: true
   ansible.builtin.service:
     name: containerd
     state: "{{ containerd_service_state }}"
