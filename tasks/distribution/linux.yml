@@ -8,7 +8,7 @@
     - name: Install the docker repository
       when: not docker_engine_skip_repo
       ansible.builtin.include_tasks:
-        file: "tasks/sub-tasks/repo-{{ ansible_os_family }}.yml"
+        file: "tasks/sub-tasks/repo-{{ ansible_os_family | lower }}.yml"
 
     - name: Install python-pip
       ansible.builtin.include_tasks:

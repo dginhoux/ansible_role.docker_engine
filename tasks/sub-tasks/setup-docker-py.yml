@@ -1,4 +1,5 @@
 ---
+
 - name: Install docker-py
   become: true
   ansible.builtin.pip:
