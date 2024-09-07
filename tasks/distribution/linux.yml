@@ -3,48 +3,60 @@
 - name: Install docker-engine
   tags:
     - install
-  when: docker_deploy_action == "install"
+  when:
+    - docker_deploy_action == "install"
   block:
-    - name: Install the docker repository
-      when: not docker_engine_skip_repo
-      ansible.builtin.include_tasks:
-        file: "tasks/sub-tasks/repo-{{ ansible_os_family | lower }}.yml"
-
     - name: Install python-pip
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-python-pip.yml
 
+    - name: Install the docker repository
+      when: 
+        - docker_engine_install_repo
+      ansible.builtin.include_tasks:
+        file: "tasks/sub-tasks/repo-{{ ansible_os_family | lower }}.yml"
+
     - name: Install docker dependencies
       become: true
-      when: not docker_engine_skip_containerd
+      when: docker_engine_install_containerd
             or
-            not docker_engine_skip_engine
+            docker_engine_install_engine
       ansible.builtin.package:
         name: "{{ docker_dependencies }}"
         state: present
 
     - name: Install containerd
-      when: not docker_engine_skip_containerd
+      when: docker_engine_install_containerd
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-containerd.yml
 
     - name: Install the docker engine
-      when: not docker_engine_skip_engine
+      when:
+        - docker_engine_install_engine
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-engine.yml
 
+    - name: Configure the docker engine
+      when:
+        - docker_engine_configure_engine
+      ansible.builtin.include_tasks:
+        file: tasks/sub-tasks/config-docker-engine.yml
+
     - name: Install the docker cli
-      when: not docker_engine_skip_cli
+      when:
+        - docker_engine_install_cli
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-cli.yml
 
     - name: Add the docker admin users to the docker group
-      when: not docker_engine_skip_group
+      when:
+        - docker_engine_create_group
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-group.yml
 
     - name: Install docker-py
-      when: not docker_engine_skip_docker_py
+      when:
+        - docker_engine_install_docker_py
       ansible.builtin.include_tasks:
         file: tasks/sub-tasks/setup-docker-py.yml
 
@@ -52,7 +64,8 @@
 - name: Uninstall docker-engine
   tags:
     - uninstall
-  when: docker_deploy_action == "uninstall"
+  when:
+    - docker_deploy_action == "uninstall"
   block:
     - name: Remove docker engine
       become: true

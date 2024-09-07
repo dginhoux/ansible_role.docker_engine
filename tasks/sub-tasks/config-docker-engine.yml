@@ -1,0 +1,60 @@
+---
+
+- name: Manage systemd docker engine service
+  when:
+    - docker_service_override | length > 0
+    - ansible_service_mgr == 'systemd'
+  block:
+    - name: Create the systemd overrides directory for docker
+      become: true
+      ansible.builtin.file:
+        name: "/etc/systemd/system/docker.service.d"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Override the systemd unit for docker
+      become: true
+      register: _docker_systemd_override
+      ansible.builtin.template:
+        src: docker-override.conf.j2
+        dest: "/etc/systemd/system/docker.service.d/override.conf"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Reload systemd and restart docker
+      become: true
+      when: 
+        - _docker_systemd_override.changed
+      ansible.builtin.service:
+        name: docker
+        state: "{% if docker_service_state != 'stopped' %}restarted{% else %}stopped{% endif %}"
+        daemon_reload: true
+
+- name: Make sure the docker daemon configuration directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/docker
+    owner: root
+    group: root
+    mode: "0755"
+    state: directory
+
+- name: Configure the docker deamon
+  become: true
+  notify: Restart docker
+  ansible.builtin.template:
+    src: docker-daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: Enable the docker daemon service and start it
+  become: true
+  ansible.builtin.service:
+    name: docker
+    state: "{{ docker_service_state }}"
+    enabled: "{{ docker_service_enabled }}"
