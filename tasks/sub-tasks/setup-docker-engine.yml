@@ -15,6 +15,11 @@
       ansible.builtin.set_fact:
         _docker_package_version: "={{ docker_package_version }}"
 
+- name: Add the docker group
+  ansible.builtin.group:
+    name: "{{ docker_group_name }}"
+    state: present
+
 - name: Install docker
   become: true
   ansible.builtin.package:

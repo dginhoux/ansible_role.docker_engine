@@ -2,7 +2,10 @@
 
 - name: Install docker-py
   become: true
+  # ignore_errors: true
   ansible.builtin.pip:
+    break_system_packages: true
     name: "{{ docker_py_package_name }}"
     version: "{{ docker_py_package_version }}"
     state: "{{ docker_py_package_state }}"
+    extra_args: "--user --upgrade"

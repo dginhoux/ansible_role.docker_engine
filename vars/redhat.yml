@@ -1,6 +1,7 @@
 ---
 docker_python_pip_packages:
   - "{% if ansible_python_version is version_compare('3.0.0', '<') %}python-pip{% else %}python3-pip{% endif %}"
+  # - "{% if ansible_python_version is version_compare('3.0.0', '<') %}python-docker{% else %}python3-docker{% endif %}"
 
 docker_dependencies:
   # See https://github.com/moby/moby/issues/26054

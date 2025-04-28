@@ -1,4 +1,5 @@
 ---
+
 - name: Add the docker administrators to the docker group
   become: true
   register: addtogroup
