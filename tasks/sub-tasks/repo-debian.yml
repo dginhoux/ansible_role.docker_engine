@@ -1,8 +1,142 @@
 ---
+
+
+
+
+
+- name: Check if Deb822 repository format is supported by the current distro
+  ansible.builtin.set_fact:
+    _docker_deb822_supported: >-
+      {{
+        (ansible_distribution == 'Ubuntu' and (ansible_distribution_major_version | int) >= 22) or
+        (ansible_distribution == 'Debian' and (ansible_distribution_major_version | int) >= 11)
+      }}
+
+
+
+- name: Configure the docker apt Repository (Deb822-style)
+  when:
+    - (docker_repo['apt_version'] | default('')) | length > 0
+    - _docker_deb822_supported
+  block:
+    - name: Install python3-debian (required by deb822_repository)
+      ansible.builtin.package:
+        name: python3-debian
+        state: present
+
+    - name: Add the docker apt Repository (Deb822-style)
+      ansible.builtin.deb822_repository:
+        name: "{{ docker_repo['name'] }}"
+        types: deb
+        uris: "https://{{ docker_repo['apt_repo_origin'] }}/{{ ansible_distribution | lower }}/"
+        suites: "{{ ansible_distribution_release | lower }}-{{ docker_repo['apt_version'] }}"
+        components: main
+        architectures: "{{ docker_apt_repo_arch }}"
+        signed_by: "{{ docker_repo['apt_gpg_key'] }}"
+      notify: update the apt cache
+
+    - name: Remove the legacy docker apt .list file when using Deb822
+      ansible.builtin.file:
+        path: "/etc/apt/sources.list.d/{{ docker_repo['name'] }}.list"
+        state: absent
+      notify: update the apt cache
+
+
+
+- name: Configure the docker apt Repository (legacy format)
+  when: >-
+    ((docker_repo['apt_version'] | default('')) | length == 0) or
+    (not _docker_deb822_supported)
+  block:
+    - name: Install gnupg
+      ansible.builtin.package:
+        name: gnupg
+        state: present
+
+    - name: Check if apt-key is available
+      ansible.builtin.stat:
+        path: /usr/bin/apt-key
+      register: _docker_apt_key_cmd
+
+    - name: Import the docker apt Repository key from URL
+      ansible.builtin.apt_key:
+        url: "{{ docker_repo['apt_gpg_key'] }}"
+        id: "{{ docker_repo['apt_gpg_key_id'] | default('') }}"
+        state: present
+      when:
+        - _docker_apt_key_cmd.stat.exists
+        - docker_repo['apt_gpg_key'] is regex("^[a-z]{3,}://")
+
+    - name: Import the docker apt Repository key from File
+      ansible.builtin.apt_key:
+        data: "{{ lookup('file', docker_repo['apt_gpg_key']) }}"
+        id: "{{ docker_repo['apt_gpg_key_id'] | default('') }}"
+        state: present
+      when:
+        - _docker_apt_key_cmd.stat.exists
+        - not docker_repo['apt_gpg_key'] is regex("^[a-z]{3,}://")
+
+    - name: Import the docker apt Repository key from URL (without apt-key)
+      ansible.builtin.get_url:
+        url: "{{ docker_repo['apt_gpg_key'] }}"
+        dest: "/etc/apt/trusted.gpg.d/{{ docker_repo['name'] }}.asc"
+        owner: root
+        group: root
+        mode: "0644"
+      when:
+        - not _docker_apt_key_cmd.stat.exists
+        - docker_repo['apt_gpg_key'] is regex("^[a-z]{3,}://")
+
+    - name: Import the docker apt Repository key from File (without apt-key)
+      ansible.builtin.copy:
+        content: "{{ lookup('file', docker_repo['apt_gpg_key']) }}"
+        dest: "/etc/apt/trusted.gpg.d/{{ docker_repo['name'] }}.asc"
+        owner: root
+        group: root
+        mode: "0644"
+      when:
+        - not _docker_apt_key_cmd.stat.exists
+        - not docker_repo['apt_gpg_key'] is regex("^[a-z]{3,}://")
+
+    - name: Add the docker apt Repository (legacy format)
+      ansible.builtin.apt_repository:
+        filename: "{{ docker_repo['name'] }}"
+        repo: "{{ docker_repo['apt_repo'] }}"
+        state: present
+      notify: update the apt cache
+
+    - name: Remove the Deb822 docker apt .sources file when using legacy format
+      ansible.builtin.file:
+        path: "/etc/apt/sources.list.d/{{ docker_repo['name'] }}.sources"
+        state: absent
+      notify: update the apt cache
+
+- name: Pin the docker apt Repository
+  ansible.builtin.template:
+    src: docker-apt-pin-repo.j2
+    dest: /etc/apt/preferences.d/docker
+    owner: root
+    group: root
+    mode: "0644"
+
+
+# - name: Flush handlers
+#   ansible.builtin.meta: flush_handlers
+
+
+
+
+
+
 - name: Update apt cache
   become: true
   ansible.builtin.apt:
     update_cache: true
+
+
+
+
+
 
 # - block:
 #     - name: install the python sni support packages
@@ -21,24 +155,26 @@
 #     and
 #     ansible_python_version is version_compare('2.7.9', '<')
 
-- name: Install apt-transport-https and gnupg if necessary
-  become: true
-  ansible.builtin.apt:
-    name:
-      - apt-transport-https
-      - gnupg
-    state: present
 
-- name: Import docker apt public key
-  become: true
-  ansible.builtin.apt_key:
-    url: "{{ docker_repo['apt_gpg_key'] }}"
-    id: "{{ docker_repo['apt_gpg_key_id'] | default('') }}"
-    state: present
 
-- name: Add the docker apt repository
-  become: true
-  ansible.builtin.apt_repository:
-    repo: "{{ docker_repo['apt_repo'] }}"
-    filename: "{{ docker_repo['name'] }}"
-    state: present
+# - name: Install apt-transport-https and gnupg if necessary
+#   become: true
+#   ansible.builtin.apt:
+#     name:
+#       - apt-transport-https
+#       - gnupg
+#     state: present
+
+# - name: Import docker apt public key
+#   become: true
+#   ansible.builtin.apt_key:
+#     url: "{{ docker_repo['apt_gpg_key'] }}"
+#     id: "{{ docker_repo['apt_gpg_key_id'] | default('') }}"
+#     state: present
+
+# - name: Add the docker apt repository
+#   become: true
+#   ansible.builtin.apt_repository:
+#     repo: "{{ docker_repo['apt_repo'] }}"
+#     filename: "{{ docker_repo['name'] }}"
+#     state: present
