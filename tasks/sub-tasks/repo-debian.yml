@@ -28,18 +28,16 @@
       ansible.builtin.deb822_repository:
         name: "{{ docker_repo['name'] }}"
         types: deb
-        uris: "https://{{ docker_repo['apt_repo_origin'] }}/{{ ansible_distribution | lower }}/"
-        suites: "{{ ansible_distribution_release | lower }}-{{ docker_repo['apt_version'] }}"
-        components: main
+        uris: "{{ docker_repo['apt_repo_origin'] }}/"
+        suites: "{{ ansible_facts.distribution_release | lower }}"
+        components: "{{ docker_repo['apt_version'] }}"
         architectures: "{{ docker_apt_repo_arch }}"
         signed_by: "{{ docker_repo['apt_gpg_key'] }}"
-      notify: update the apt cache
 
     - name: Remove the legacy docker apt .list file when using Deb822
       ansible.builtin.file:
         path: "/etc/apt/sources.list.d/{{ docker_repo['name'] }}.list"
         state: absent
-      notify: update the apt cache
 
 
 
@@ -103,13 +101,11 @@
         filename: "{{ docker_repo['name'] }}"
         repo: "{{ docker_repo['apt_repo'] }}"
         state: present
-      notify: update the apt cache
 
     - name: Remove the Deb822 docker apt .sources file when using legacy format
       ansible.builtin.file:
         path: "/etc/apt/sources.list.d/{{ docker_repo['name'] }}.sources"
         state: absent
-      notify: update the apt cache
 
 - name: Pin the docker apt Repository
   ansible.builtin.template:
