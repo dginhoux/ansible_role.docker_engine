@@ -209,7 +209,7 @@ docker_repo_ce_stable:
   yum_gpg_key: "https://download.docker.com/linux/centos/gpg"
   yum_gpg_check: "yes"
   apt_version: stable
-  apt_repo_origin: https://download.docker.com/linux
+  apt_repo_origin: https://download.docker.com/linux/debian
   apt_repo: "deb [arch={{ docker_apt_repo_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
   apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
   apt_gpg_key_id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
@@ -220,7 +220,7 @@ docker_repo_ce_edge:
   yum_gpg_key: "https://download.docker.com/linux/centos/gpg"
   yum_gpg_check: "yes"
   apt_version: edge
-  apt_repo_origin: https://download.docker.com/linux
+  apt_repo_origin: https://download.docker.com/linux/debian
   apt_repo: "deb [arch={{ docker_apt_repo_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} edge"
   apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
   apt_gpg_key_id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
@@ -231,7 +231,7 @@ docker_repo_ce_test:
   yum_gpg_key: "https://download.docker.com/linux/centos/gpg"
   yum_gpg_check: "yes"
   apt_version: test
-  apt_repo_origin: https://download.docker.com/linux
+  apt_repo_origin: https://download.docker.com/linux/debian
   apt_repo: "deb [arch={{ docker_apt_repo_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} test"
   apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
   apt_gpg_key_id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
@@ -242,7 +242,7 @@ docker_repo_ce_nightly:
   yum_gpg_key: "https://download.docker.com/linux/centos/gpg"
   yum_gpg_check: "yes"
   apt_version: nightly
-  apt_repo_origin: https://download.docker.com/linux
+  apt_repo_origin: https://download.docker.com/linux/debian
   apt_repo: "deb [arch={{ docker_apt_repo_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} nightly"
   apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
   apt_gpg_key_id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"

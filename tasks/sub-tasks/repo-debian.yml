@@ -28,7 +28,7 @@
       ansible.builtin.deb822_repository:
         name: "{{ docker_repo['name'] }}"
         types: deb
-        uris: "{{ docker_repo['apt_repo_origin'] }}/"
+        uris: "{{ docker_repo['apt_repo_origin'] }}"
         suites: "{{ ansible_facts.distribution_release | lower }}"
         components: "{{ docker_repo['apt_version'] }}"
         architectures: "{{ docker_apt_repo_arch }}"
@@ -107,6 +107,7 @@
         path: "/etc/apt/sources.list.d/{{ docker_repo['name'] }}.sources"
         state: absent
 
+
 - name: Pin the docker apt Repository
   ansible.builtin.template:
     src: docker-apt-pin-repo.j2
@@ -114,14 +115,6 @@
     owner: root
     group: root
     mode: "0644"
-
-
-# - name: Flush handlers
-#   ansible.builtin.meta: flush_handlers
-
-
-
-
 
 
 - name: Update apt cache
